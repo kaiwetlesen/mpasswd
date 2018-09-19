@@ -1,3 +1,4 @@
+#ifdef USE_SHADOW_AUTH
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,64 +9,45 @@
 #define HEADER_BUF 32
 #define PASSWD_BUF 128
 
-int shadow_auth(char *user, char *pass);
-
-/*
-int main(int argc, char **argv) {
-	if (argv[1] && argv[2]) {
-		if (shadow_auth(argv[1], argv[2]) > 0) {
-			printf("Password correct\n");
-		}
-		else {
-			printf("Wrong password\n");
-		}
-	}
-	else {
-		printf("Invalid usage\n");
-	}
-	return 0;
-}
-*/
+extern int shadow_auth(char *user, char *pass);
 
 int shadow_auth(char *user, char *pass) {
 	struct spwd *sp_ent, *look;
 	char *entry, *token, *hashalgo, *salt, *passwd;
 	char passwd_header[HEADER_BUF]; /* $id$salt$ portion of passwd entry */
 	char *generated_entry; /* Crypt generated response, with room to grow */
+	char no[] = "NO";
+	char yes[] = "YES";
 	int entrylen;
 
-	if (sp_ent = getspnam(user)) {
+	if (user && strlen(user) && (sp_ent = getspnam(user))) {
 		entry = sp_ent->sp_pwdp;
 		entrylen = strlen(entry) + 1;
-	}
-	else if (errno) {
-		perror("Failed to retrieve shadow entry");
-		return errno;
+		
+		hashalgo = strtok(entry, "$");
+		salt = strtok(NULL, "$");
+		passwd = strtok(NULL, "$");
 	}
 	else {
-		printf("No password entry exists for user %s\n", user);
-		return 0;
+	/* No password entry exists for user, or could not retrieve shadow entry. Check errno. */
+		hashalgo = NULL;
+		salt = NULL;
+		passwd = NULL;
 	}
-
-	hashalgo = strtok(entry, "$");
-	salt = strtok(NULL, "$");
-	passwd = strtok(NULL, "$");
 	
-	if (hashalgo && salt) {
+	if (hashalgo && salt && pass) {
 		/* Create salt header and rejoin password entry */
 		snprintf(passwd_header, HEADER_BUF, "$%s$%s$", hashalgo, salt);
 		snprintf(entry, entrylen, "%s%s", passwd_header, passwd);
 		generated_entry = crypt(pass, passwd_header);
 	}
-	else {
-		return -1;
+	else { /* If the above didn't work, force a passwd failure, as 'no' != 'yes'. */
+		entry = no;
+		generated_entry = yes;
+		entrylen = 3;
 	}
 	
 	/* If the shadow entry we generated matches the stored password entry, BAM we good! */
-	if (strncmp(entry, generated_entry, entrylen) == 0) {
-		return 1;
-	}
-	else {
-		return 0;
-	}
+	return strncmp(entry, generated_entry, entrylen) == 0;
 }
+#endif
