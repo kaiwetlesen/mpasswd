@@ -4,27 +4,7 @@
 #define APPNAME "mpasswd"
 
 #ifndef CFGFILE
-#define CFGFILE "/etc/mpasswd/pwstrength.cfg"
+#define CFGFILE "/etc/mpasswd/mpasswd.ini"
 #endif
-
-struct cfg_pwcomplexity {
-	int complexity;
-	int min_lower_alpha;
-	int min_upper_alpha;
-	int min_numeric;
-	int min_special;
-};
-
-struct cfg_pwcredit {
-	int lower_alpha;
-	int upper_alpha;
-	int numeric;
-	int special;
-};
-
-struct appconfig {
-	struct cfg_pwcomplexity pwcomplexity;
-	struct cfg_pwcredit pwcredit;
-};
 
 #endif

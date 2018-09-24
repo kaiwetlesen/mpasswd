@@ -13,4 +13,4 @@ build: mpasswd
 .PHONY: clean
 
 clean:
-	rm -rf *.o
+	rm -rf *.o mpasswd
