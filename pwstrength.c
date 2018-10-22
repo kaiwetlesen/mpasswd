@@ -5,7 +5,6 @@
 #include "pwstrength.h"
 
 /*
-*/
 int main(int argc, char **argv) {
 	struct appconfig cfg;
 	uint8_t requirements;
@@ -34,6 +33,7 @@ int main(int argc, char **argv) {
 	printf("Requirements met: 0x%02X\n",requirements);
 	printf("Password complexity: %d\n", complexity);
 }
+*/
 
 uint8_t check_mins(char *passwd, struct cfg_pwcomplexity complexitycfg) {
 	char *pw_c;

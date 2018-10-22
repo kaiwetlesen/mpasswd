@@ -5,7 +5,7 @@ DEPS = hellomake.h
 %.o: %.c $(DEPS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-mpasswd: mpasswd.o auth.o shadowauth.o
+mpasswd: mpasswd.o auth.o shadowauth.o pwstrength.o chpasswd.o appconfig.o
 	$(CC) $(CFLAGS) -o $@ $^
 
 build: mpasswd

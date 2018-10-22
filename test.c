@@ -1,14 +1,16 @@
 #include <stdio.h>
 #include <stdint.h>
-#define BUFFER 32
+#include "getpass.h"
 
 int main(void) {
-	char buffer[BUFFER], *mover;
-	printf("Type something: ");
-	fgets(buffer, BUFFER, stdin);
+	char *password, *mover;
+	password = getpasswd(stdin, "Password: ");
 	
-	for (mover = buffer; *mover; mover++) {
+	printf("Buffer contains: '%s'\n", password);
+	for (mover = password; *mover; mover++) {
 		printf("0x%02X ", (uint8_t)*mover);
 	}
+	putchar('\n');
+
 	return 0;
 }
