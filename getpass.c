@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <termios.h>
 #include "mpasswd.h"
@@ -27,7 +28,7 @@ int main(void) {
 
 char *getpass(FILE *fd, char *prompt) {
 	static char pw_buffer[PWBUFLEN];
-	char *mover;
+	char *mover, *password;
 	memset(pw_buffer, '\0', PWBUFLEN);
 	
 	if (fileno(fd) != fileno(stdin)) {
@@ -38,6 +39,7 @@ char *getpass(FILE *fd, char *prompt) {
 		echo_off();
 		fgets(pw_buffer, PWBUFLEN, stdin);
 		echo_on();
+		putchar('\n');
 	}
 	
 	mover = strchr(pw_buffer, '\r');
@@ -48,7 +50,14 @@ char *getpass(FILE *fd, char *prompt) {
 	if (mover) {
 		*mover = '\0';
 	}
-	return pw_buffer;
+	password = (char *)calloc(strnlen(pw_buffer, PWBUFLEN) + 1, sizeof(char));
+	strncpy(password, pw_buffer, strnlen(pw_buffer, PWBUFLEN));
+	return password;
+}
+
+void freepass(char *password) {
+	memset(password, '\0', strnlen(password, PWBUFLEN));
+	free(password);
 }
 
 void echo_off(void) {
