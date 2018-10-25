@@ -1,22 +1,20 @@
 #include <stdio.h>
-#include <stdint.h>
-#include "getpass.h"
+#include <stdlib.h>
+
+#include <sys/types.h>
+#include <pwd.h>
+
+#include <shadow.h>
 
 int main(void) {
-	char *old_pw, *new_pw, *confirm_pw, *mover;
-	old_pw = getpass(stdin, "Old Password: ");
-	new_pw = getpass(stdin, "New Password: ");
-	confirm_pw = getpass(stdin, "Confirm New Password: ");
-	
-	printf("Buffer contains: '%s'\n", old_pw);
-	for (mover = old_pw; *mover; mover++) {
-		printf("0x%02X ", (uint8_t)*mover);
+	struct spwd *user;
+
+	user = getspnam("kaiw");
+	if (user) {
+		printf("User: %s\n", user->sp_namp);
 	}
-	putchar('\n');
-
-	freepass(old_pw);
-	freepass(new_pw);
-	freepass(confirm_pw);
-
+	else {
+		printf("User not found!\n");
+	}
 	return 0;
 }

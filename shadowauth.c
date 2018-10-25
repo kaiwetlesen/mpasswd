@@ -46,7 +46,7 @@ int shadow_auth(char *user, char *pass) {
 		generated_entry = yes;
 		entrylen = 3;
 	}
-	
+
 	/* If the shadow entry we generated matches the stored password entry, BAM we good! */
 	return strncmp(entry, generated_entry, entrylen) == 0;
 }

@@ -5,39 +5,43 @@
 #include "mpasswd.h"
 #include "getpass.h"
 
-#define PWBUFLEN 1024
-
 void echo_off(void);
 void echo_on(void);
 
 /* Include stdint.h before using this demo: */
 /*
 int main(void) {
-	char *password, *mover;
-	password = getpasswd(stdin, "Password: ");
+	char *old_pw, *new_pw, *confirm_pw, *mover;
+	old_pw = getpass(stdin, "Old Password: ");
+	new_pw = getpass(stdin, "New Password: ");
+	confirm_pw = getpass(stdin, "Confirm New Password: ");
 	
-	printf("Buffer contains: '%s'\n", password);
-	for (mover = password; *mover; mover++) {
+	printf("Buffer contains: '%s'\n", old_pw);
+	for (mover = old_pw; *mover; mover++) {
 		printf("0x%02X ", (uint8_t)*mover);
 	}
 	putchar('\n');
+
+	freepass(old_pw);
+	freepass(new_pw);
+	freepass(confirm_pw);
 
 	return 0;
 }
 */
 
 char *getpass(FILE *fd, char *prompt) {
-	static char pw_buffer[PWBUFLEN];
+	static char pw_buffer[PWMAXLEN];
 	char *mover, *password;
-	memset(pw_buffer, '\0', PWBUFLEN);
+	memset(pw_buffer, '\0', PWMAXLEN);
 	
 	if (fileno(fd) != fileno(stdin)) {
-		fgets(pw_buffer, PWBUFLEN, fd);
+		fgets(pw_buffer, PWMAXLEN, fd);
 	}
 	else {
 		printf("%s", prompt != NULL ? prompt : "Adgangskode: ");
 		echo_off();
-		fgets(pw_buffer, PWBUFLEN, stdin);
+		fgets(pw_buffer, PWMAXLEN, stdin);
 		echo_on();
 		putchar('\n');
 	}
@@ -50,13 +54,13 @@ char *getpass(FILE *fd, char *prompt) {
 	if (mover) {
 		*mover = '\0';
 	}
-	password = (char *)calloc(strnlen(pw_buffer, PWBUFLEN) + 1, sizeof(char));
-	strncpy(password, pw_buffer, strnlen(pw_buffer, PWBUFLEN));
+	password = (char *)calloc(strnlen(pw_buffer, PWMAXLEN) + 1, sizeof(char));
+	strncpy(password, pw_buffer, strnlen(pw_buffer, PWMAXLEN));
 	return password;
 }
 
 void freepass(char *password) {
-	memset(password, '\0', strnlen(password, PWBUFLEN));
+	memset(password, '\0', strnlen(password, PWMAXLEN));
 	free(password);
 }
 
