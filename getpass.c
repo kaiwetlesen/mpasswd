@@ -30,7 +30,7 @@ int main(void) {
 }
 */
 
-char *getpass(FILE *fd, char *prompt) {
+char *getpass_fd(FILE *fd, char *prompt) {
 	static char pw_buffer[PWMAXLEN];
 	char *mover, *password;
 	memset(pw_buffer, '\0', PWMAXLEN);

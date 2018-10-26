@@ -33,6 +33,7 @@
 #define DEF_SSHPRIVKEY "/etc/mpasswd/mpasswd_rsa"
 #define DEF_SSHPUBKEY "/etc/mpasswd/mpasswd_rsa.pub"
 
+/* A test/use case: */
 /*int main(void) {
 	struct appconfig cfg;
 	cfg = load_cfg("/home/kmwetles/Projects/mpasswd/mpasswd.ini");

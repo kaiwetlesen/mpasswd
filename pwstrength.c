@@ -35,6 +35,17 @@ int main(int argc, char **argv) {
 }
 */
 
+/* 
+ * LIBRARY NOTES:
+ * This is by no means an ideal way by which to check if a password is sufficiently
+ * strong. A much better approach involves verifying if a password clusters among
+ * commonly chosen passwords (often uncovered by breaches etc). See this article
+ * for more information:
+ * https://diogomonica.com/2014/10/11/password-security-why-the-horse-battery-staple-is-not-correct/
+ * In the future, I'll write a library that incorporates these findings, as system
+ * access passwords are intended to be memorised (for better or worse).
+ */
+
 uint8_t check_mins(char *passwd, struct cfg_pwcomplexity complexitycfg) {
 	char *pw_c;
 	int num_lalpha, num_ualpha, num_numeric, num_special;

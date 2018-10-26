@@ -8,6 +8,7 @@
 #define HAS_MIN_LENGTH  0x10
 #define HAS_ALL_REQS    0x1F
 
+/* Returns an unsigned integer with a bitmask indicating which requirements are met. */
 uint8_t check_mins(char *passwd, struct cfg_pwcomplexity complexitycfg);
 int compute_complexity(char *passwd, struct cfg_pwcredit creditcfg);
 

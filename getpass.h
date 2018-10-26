@@ -3,6 +3,7 @@
 
 #define PWMAXLEN 1024
 
-char *getpass(FILE *fd, char *prompt);
+/* Apparently, getpass collides with a function in the unistd.h library... */
+char *getpass_fd(FILE *fd, char *prompt);
 void freepass(char *password);
 #endif
