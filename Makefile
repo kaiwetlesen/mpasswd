@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-g -I. -lcrypt -lini_config -DUSE_SHADOW_AUTH
+CFLAGS=-g -I. -lcrypt -lini_config -lssh2 -DUSE_SHADOW_AUTH
 DEPS = hellomake.h
 
 %.o: %.c $(DEPS)
