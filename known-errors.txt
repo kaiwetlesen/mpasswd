@@ -1,0 +1,2 @@
+Could not connect: (-16) Unable to open public key file
+Could not connect: (-18) Username/PublicKey combination invalid

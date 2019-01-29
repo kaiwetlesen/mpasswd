@@ -22,11 +22,37 @@ struct cfg_ssh {
 	char *privkey_filename;
 	char *privkey_passphrase;
 	char *pubkey_filename;
+	char *subsys_name;
+};
+
+struct cfg_ctlsystems {
+	struct ctlsystem *list;
+	int size;
+};
+
+struct ctlsystem {
+	char *ctlsystem;
+	char *ctlsystem_hostname;
+};
+
+struct cfg_tgtsystems {
+	struct tgtsystem *list;
+	int size;
+};
+
+struct tgtsystem {
+	char *tgtsystem;
+	char *tgtsystem_hostname;
+	char *tgtsystem_key;
 };
 
 struct appconfig {
 	struct cfg_pwcomplexity pwcomplexity;
 	struct cfg_pwcredit pwcredit;
+	struct cfg_ssh ssh;
+	struct cfg_ctlsystems ctlsystems;
+	char *system_key;
+	int is_ctl_system;
 };
 
 struct appconfig load_cfg(char *cfg_file);
