@@ -1,2 +1,5 @@
-libini_config
-pam
+On a Linux or UNIX system, the following libraries must be installed:
+- libssh2: Available by `yum install libssh2`
+- libini_config: Available by `yum install libini_config`
+- gmime: Available by `yum install gmime`
+- pam: Typically installed on a UNIX system as part of the base OS
