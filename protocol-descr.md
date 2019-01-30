@@ -10,13 +10,13 @@ not sent by the target system back to the controlling host.
 
 |     Command      |                       Description                           |
 | ---------------- | ----------------------------------------------------------- |
-| HELO [host name] | Establishes first contact with the MPasswd target and       |
-|                  | `[host name]` parameter.                                    |
-| AUTH [secret]    | Sends the protocol authentication secret to the MPasswd     |
-|                  | target for authentication.                                  |
-| VRFY [user name] | Verifies that a user account exists for `[user name]`.      |
-|                  | Requires that the controlling host be authenticated using   |
-|                  | `AUTH`.                                                     |
+| HELO [host name] | Establishes first contact with the MPasswd target and        
+                     `[host name]` parameter.                                    |
+| AUTH [secret]    | Sends the protocol authentication secret to the MPasswd      
+                     target for authentication.                                  |
+| VRFY [user name] | Verifies that a user account exists for `[user name]`. 
+                     Requires that the controlling host be authenticated using
+                     `AUTH`.                                                     |
 | CHPW [user name] | Initiates a password change request for `[user name]`.      |
 |                  | Requires that the controlling host be authenticated using   |
 |                  | `AUTH`.                                                     |
