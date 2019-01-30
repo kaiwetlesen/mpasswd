@@ -4,7 +4,7 @@
 #include "sshclient.h"
 
 int main(void) {
-	int socketfd, error;
+	int socketfd, error, status;
 	char *errorline;
 	char buffer[100];
 	LIBSSH2_SESSION *session;
@@ -37,13 +37,15 @@ int main(void) {
 		exit(errno);
 	}
 	/* Do SSH things here */
-		libssh2_channel_subsystem(channel, "ls /");
+		libssh2_channel_subsystem(channel, "list");
 
-		libssh2_channel_write(channel, "hello\n", 3);
-		while (libssh2_channel_read(channel, buffer, 100) > 0) {
-			printf("%s", buffer);
-			memset(buffer, '\0', 100);
-		}
+		libssh2_channel_write(channel, "HELO lilo.almaden.ibm.com\n", 7);
+		libssh2_channel_read(channel, buffer, 100);
+		printf("%s", buffer);
+		memset(buffer, '\0', 100);
+		printf("Exiting...\n");
+		libssh2_channel_write(channel, "exit", 5);
+		printf("Final status: %d\n", status);
 		
 	ssh_close(channel);
 	#if 0
