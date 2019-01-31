@@ -39,6 +39,7 @@ int main(void) {
 	/* Do SSH things here */
 		libssh2_channel_subsystem(channel, "list");
 
+	/* Do MCTP things here */
 		libssh2_channel_write(channel, "HELO lilo.almaden.ibm.com\n", 7);
 		libssh2_channel_read(channel, buffer, 100);
 		printf("%s", buffer);

@@ -129,7 +129,7 @@ composition of 2 to 123 lower-range UTF-8 characters (maximum character
 value 0x7F) terminated by a newline.
 
 ### Status Code Format
-`999 A{2-123}\n`
+`^999 A{2-123}\n$`
 
 ^: Beginning of input.
 
@@ -145,21 +145,17 @@ A{2-123}: Two to one hundred twenty three single-byte UTF-8 characters
 
 | Code |     Status     |                       Description                           |
 | ---- | -------------- | ----------------------------------------------------------- |
-|  220 |     Ready      | Indicates that MCTP service is ready. Sent by target        |
-|      |                | system to the control system upon successful connect.       |
+|  220 |     Ready      | Indicates that MCTP service is ready. Sent by target system to the control system upon successful connect. |
 |  221 | Shutting Down  | MCTP is closing down the protocol.                          |
 |  250 |  Command Okay  | Requested MCTP command processed successfully.              |
-|  354 |  Begin Data    | Indicates that the MCTP target system is ready to receive   |
-|      |                | initial password data transmission.                         |
-|  355 | Continue Data  | Indicates that the MCTP target system is ready to receive   |
-|      |                | additional password data.                                   |
+|  354 |  Begin Data    | Indicates that the MCTP target system is ready to receive initial password data transmission. |
+|  355 | Continue Data  | Indicates that the MCTP target system is ready to receive additional password data. |
 |  421 |  Unavailable   | Indicates that the MCTP service is unavailable or disabled. |
-|  451 | Aborted Error  | Error in local processing of MCTP command caused command to |
-|      |                | abort. See target system error log.                         |
+|  451 | Aborted Error  | Error in local processing of MCTP command caused command to abort. See target system error log. |
 |  500 | Command Unknwn | Command is unknown to MCTP or is invalid.                   |
 |  501 |  Syntax Error  | An error was encountered with the command syntax.           |
-|  521 | Control Reject | Indicates that the MCTP target system does not accept MCTP  |
-|      |                | requests from controlling host.                             |
-|  530 | Access Denied  | MCTP target host has denied the target system's access to   |
-|      |                | the previous command, or authentication failed.             |
+|  503 | Wrong Sequence | MCTP commands were sent in the wrong sequence.              |
+|  521 | Control Reject | Indicates that the MCTP target system does not accept MCTP requests from controlling host. |
+|  530 | Access Denied  | MCTP target host has denied the target system's access to the previous command, or authentication failed. |
 |  551 |  User Unknown  | Indicates that the user is unknown to the target system.    |
+|  554 | Transact Fail  | The transaction failed due to an unknown error.             |

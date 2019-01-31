@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <pwd.h>
 
+#include "config.h"
 #include "mpasswd.h"
 #include "appconfig.h"
 #include "getpass.h"
