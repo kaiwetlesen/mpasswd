@@ -47,5 +47,6 @@ int MCTP_recv(char *message, int message_len) {
 	status_long = strtol(status_code, &extra, 10);
 	if (extra) {
 		memset(message, '\0', message_len);
+		status = 
 	}
 }

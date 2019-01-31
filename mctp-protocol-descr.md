@@ -87,27 +87,12 @@ ARGUMENT: A free-form string terminated by a new-line.
 
 |     Command      |   Type    |                       Description                           |
 | ---------------- | --------- | ----------------------------------------------------------- |
-| HELO [host name] |  Variant  | Establishes first contact with the MPasswd target and       |
-|                  |           | `[host name]` parameter. Target host may wish to verify     |
-|                  |           | this argument against the control system's connection.      |
-| AUTH [secret]    |  Variant  | Sends the protocol authentication secret to the MPasswd     |
-|                  |           | target for authentication.                                  |
-| VRFY [user name] |  Variant  | Verifies that a user account exists for `[user name]`.      |
-|                  |           | Requires that the controlling host be authenticated using   |
-|                  |           | `AUTH`.                                                     |
-| CHPW [user name] |  Variant  | Initiates a password change request for `[user name]`.      |
-|                  |           | Requires that the controlling host be authenticated using   |
-|                  |           | `AUTH`.                                                     |
-| DATA             | Streaming | Initiates data transfer sequence. This is used for          |
-|                  |           | transferring the new password to the target host. Data may  |
-|                  |           | be written after target host affirms transfer. Data transfer|
-|                  |           | terminates when the control system writes a '.' (period)    |
-|                  |           | character on its own line. Controlling systems must         |
-|                  |           | authenticate using `AUTH` and initiate a `CHPW` prior to    |
-|                  | Immediate | using this command.                                         |
-| RSET             |           | Resets the MPasswd protocol on the target system. A control |
-|                  |           | system must re-authenticate and resend any required         |
-|                  |           | commands prior to continuing.                               |
+| HELO [host name] |  Variant  | Establishes first contact with the MPasswd target and `[host name]` parameter. Target host may wish to verify this argument against the control system's connection. |
+| AUTH [secret]    |  Variant  | Sends the protocol authentication secret to the MPasswd target for authentication. |
+| VRFY [user name] |  Variant  | Verifies that a user account exists for `[user name]`. Requires that the controlling host be authenticated using `AUTH`. |
+| CHPW [user name] |  Variant  | Initiates a password change request for `[user name]`. Requires that the controlling host be authenticated using `AUTH`. |
+| DATA             | Streaming | Initiates data transfer sequence. This is used for transferring the new password to the target host. Data may be written after target host affirms transfer. Data transfer terminates when the control system writes a '.' (period) character on its own line. Controlling systems must authenticate using `AUTH` and initiate a `CHPW` prior to using this command. |
+| RSET             | Immediate | Resets the MPasswd protocol on the target system. A control system must re-authenticate and resend any required commands prior to continuing. |
 | NOOP             | Immediate | Performs no operation.                                      |
 | QUIT             | Immediate | Terminates the connection to the target host.               |
 
