@@ -46,15 +46,21 @@ communication steps be reduced as much as possible.
 15. `CS`: RSET
 16. `TS`: 250 Okay, resetting...
 17. `CS`: CHPW kaiwetlesen
-18. `TS`: 250 Change password request for 'kaiwetlesen' accepted. Please begin sending password DATA.
-19. `CS`: DATA
-20. `TS`: 354 Okay, please begin sending data. End transfer with a '.' on its own line.
-21. `CS`: _password data here_
-22. `TS`: 355 Thank you, would you like to send more?
-23. `CS`: .
-24. `TS`: 250 Okay thank you. Password change initiated.
-25. `CS`: QUIT
-26. `TS`: 221 Shutting down at your request. Thank you for using MCTP!
+18. `TS`: 503 Please begin by introducing then authenticating yourself.
+19. `CS`: HELO controlsystem.example.com
+20. `TS`: 250 Hello controlsystem.example.com, pleased to meet you. I am targetsystem.other.domain.com.
+21. `CS`: AUTH correcttargetkeyhere
+22. `TS`: 250 OK
+22. `CS`: CHPW kaiwetlesen
+23. `TS`: 250 Change password request for 'kaiwetlesen' accepted. Please begin sending password DATA.
+24. `CS`: DATA
+25. `TS`: 354 Okay, please begin sending data. End transfer with a '.' on its own line.
+26. `CS`: _password data here_
+27. `TS`: 355 Thank you, would you like to send more?
+28. `CS`: .
+29. `TS`: 250 Okay thank you. Password change initiated.
+30. `CS`: QUIT
+31. `TS`: 221 Shutting down at your request. Thank you for using MCTP!
 
 All commands, command parameters, status codes, and status detail lines must
 be sent using single-byte characters in the first page of the UTF-8 character 
