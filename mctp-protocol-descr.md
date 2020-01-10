@@ -5,8 +5,8 @@ includes a description of the protocol, its purpose, as well as the commands and
 status codes required for full functionality.
 
 ## Protocol Description
-MCTP is an application layer protocol that facilitates delivery of new 
-credentials from a sanctioned control system to a target system. is similar 
+MCTP is a thin application layer protocol that facilitates delivery of new 
+credentials from a sanctioned control system to a target system. It is similar 
 to SMTP with a set of fixed commands and codes to direct the protocol flow. 
 It is designed to run atop any secured and authenticated transport protocol 
 such as TLS or SSH.
@@ -19,52 +19,33 @@ status code in confirmation of each transmission from the control system. This
 includes input data transmissions sent as part of a streaming command. It is
 strongly encouraged to reference the status after each attempted transmission.
 
-### Example Protocol Flow
-This example shows how a full conversation might happen between an MCTP control
-host and a target host. In a production setting it is preferred that 
-communication steps be reduced as much as possible.
-
-- CS indicates transmission from control system to target system.
-- TS indicates a transmission from target system to control system.
-
- 1. `CS`: Secure Connect
- 2. `TS`: 220 MCTP Ready
- 3. `CS`: HELO controlsystem.example.com
- 4. `TS`: 250 Hello controlsystem.example.com, pleased to meet you. I am targetsystem.other.domain.com.
- 5. `CS`: AUTH wrongkeyhere
- 6. `TS`: 503 Sorry, key authorization failed.
- 7. `CS`: AUTH correcttargetkeyhere
- 8. `TS`: 250 OK
- 9. `CS`: VRFY someuser
-10. `TS`: 551 Username 'someuser' not known.
-11. `CS`: VRFY kaiwetlesen
-12. `TS`: 250 Oh hey, I know 'kaiwetlesen'!
-13. `CS`: CHPW unknownuser
-14. `TS`: 551 I do not know 'unknownuser'. Change password rejected.
-13. `CS`: CHPW otherknownuser
-14. `TS`: 250 Change password request for 'otherknownuser' accepted. Please begin sending password DATA.
-15. `CS`: RSET
-16. `TS`: 250 Okay, resetting...
-17. `CS`: CHPW kaiwetlesen
-18. `TS`: 250 Change password request for 'kaiwetlesen' accepted. Please begin sending password DATA.
-19. `CS`: DATA
-20. `TS`: 354 Okay, please begin sending data. End transfer with a '.' on its own line.
-21. `CS`: _password data here_
-22. `TS`: 355 Thank you, would you like to send more?
-23. `CS`: .
-24. `TS`: 250 Okay thank you. Password change initiated.
-25. `CS`: QUIT
-26. `TS`: 221 Shutting down at your request. Thank you for using MCTP!
-
+## Protocol Limits
 All commands, command parameters, status codes, and status detail lines must
 be sent using single-byte characters in the first page of the UTF-8 character 
 set. This includes all characters in the first 127 characters of the ISO 
-Latin-1 character set. Data may be sent in any supported character format.
+Latin-1 character set.
+
+The maximum length of any single MCTP data exchange is limited by `MCTP\_BUFLEN`,
+which defaults to 128 octets (eight bit quantities). This may be configured up 
+to the end-to-end maximum transmission unit size (MTU).
 
 ## Control Commands
 All commands are sent by the controlling system to the target. They are not
 sent by the target system back to the controlling host. Variant commands are
 separated from their arguments by a _single space character_ (0x20 in UTF-8).
+
+### Control Command Limits
+All MCTP commands are limited to exactly four octets in length.
+
+Immediate commands are limited to five characters total including the newline
+terminator, but it is expected tha
+
+Variant commands are permitted to possess one argument such that the argument
+is separated from the command by one space and that the entire command-argument
+string does not exceed MCTP\_BUFLEN octets in length.
+
+All data sent after invoking a streaming command may be up to MCTP\_BUFLEN octets
+in length.
 
 ### General Command Format
 |   Type    |                  Format                      |
@@ -107,11 +88,18 @@ detailed descriptions via a lookup table (see Table 2). Detailed descriptions
 are free-form and not meant to be used for anything more than displaying to
 the user.
 
+### Status Code Limits
+The maximum length of any single MCTP data exchange is limited by MCTP\_BUFLEN,
+which defaults to 128 octets. This may be configured up to the end-to-end maximum
+transmission unit size (MTU).
+
 All status codes are sent as stringified three-digit integers followed by one
 UTF-8 space and a brief detail line. All returned characters are fixed size 
 at one byte per character streams. Status detail lines are permitted to be any
-composition of 2 to 123 lower-range UTF-8 characters (maximum character 
-value 0x7F) terminated by a newline.
+composition of 2 to `MCTP\_BUFLEN - 4` lower-range UTF-8 characters (maximum 
+character value 0x7F) terminated by a newline. In the default configuration, 
+MCTP status messages are limited to 123 characters including the null terminator.
+
 
 ### Status Code Format
 `^999 A{2-123}\n$`
@@ -144,3 +132,46 @@ A{2-123}: Two to one hundred twenty three single-byte UTF-8 characters
 |  530 | Access Denied  | MCTP target host has denied the target system's access to the previous command, or authentication failed. |
 |  551 |  User Unknown  | Indicates that the user is unknown to the target system.    |
 |  554 | Transact Fail  | The transaction failed due to an unknown error.             |
+
+### Example Protocol Flow
+This example shows how a full conversation might happen between an MCTP control
+host and a target host. In a production setting it is preferred that 
+communication steps be reduced as much as possible.
+
+- CS indicates transmission from control system to target system.
+- TS indicates a transmission from target system to control system.
+
+ 1. `CS`: Secure Connect
+ 2. `TS`: 220 MCTP Ready
+ 3. `CS`: HELO controlsystem.example.com
+ 4. `TS`: 250 Hello controlsystem.example.com, pleased to meet you. I am targetsystem.other.domain.com.
+ 5. `CS`: AUTH wrongkeyhere
+ 6. `TS`: 503 Sorry, key authorization failed.
+ 7. `CS`: AUTH correcttargetkeyhere
+ 8. `TS`: 250 OK
+ 9. `CS`: VRFY someuser
+10. `TS`: 551 Username 'someuser' not known.
+11. `CS`: VRFY kaiwetlesen
+12. `TS`: 250 Oh hey, I know 'kaiwetlesen'!
+13. `CS`: CHPW unknownuser
+14. `TS`: 551 I do not know 'unknownuser'. Change password rejected.
+13. `CS`: CHPW otherknownuser
+14. `TS`: 250 Change password request for 'otherknownuser' accepted. Please begin sending password DATA.
+15. `CS`: RSET
+16. `TS`: 250 Okay, resetting...
+17. `CS`: CHPW kaiwetlesen
+18. `TS`: 503 Please begin by introducing then authenticating yourself.
+19. `CS`: HELO controlsystem.example.com
+20. `TS`: 250 Hello controlsystem.example.com, pleased to meet you. I am targetsystem.other.domain.com.
+21. `CS`: AUTH correcttargetkeyhere
+22. `TS`: 250 OK
+22. `CS`: CHPW kaiwetlesen
+23. `TS`: 250 Change password request for 'kaiwetlesen' accepted. Please begin sending password DATA.
+24. `CS`: DATA
+25. `TS`: 354 Okay, please begin sending data. End transfer with a '.' on its own line.
+26. `CS`: _password data here_
+27. `TS`: 355 Thank you, would you like to send more?
+28. `CS`: .
+29. `TS`: 250 Okay thank you. Password change initiated.
+30. `CS`: QUIT
+31. `TS`: 221 Shutting down at your request. Thank you for using MCTP!
