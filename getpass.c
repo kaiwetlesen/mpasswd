@@ -5,9 +5,6 @@
 #include "mpasswd.h"
 #include "getpass.h"
 
-void echo_off(void);
-void echo_on(void);
-
 /* Include stdint.h before using this demo: */
 /*
 int main(void) {

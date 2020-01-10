@@ -56,12 +56,12 @@ int main(void) {
 	if (!connected) {
 		printf("Connection failed\n");
 		if (socket_fd >= 0) close(socket_fd);
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 
 	if (libssh2_init(0) != 0) {
 		printf("SSH initialization failed -- Cannot continue.\n");
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 
 	session = libssh2_session_init();
@@ -74,7 +74,7 @@ int main(void) {
 	if (session == NULL || libssh2_session_handshake(session, socket_fd) != 0) {
 		errnum = libssh2_session_last_error(session, &errline, NULL, 0);
 		printf("Failed to establish a session: (%d) %s\n", errnum, errline);
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	else {
 		printf("Session worked!\n");

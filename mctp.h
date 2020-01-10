@@ -24,6 +24,13 @@
  * arguments, newline, and null terminator.
  */
 #define MCTP_BUFLEN 128
+#define MCTP_PROTCOL_ERR -1
+
+#define MCTP_CLT_STATE_HELO 0
+#define MCTP_CLT_STATE_AUTH 0
+#define MCTP_CLT_STATE_VRFY 0
+
+#define MCTP_STATE_TRANSITIONS {  }
 
 int MCTP_send_cred(char *from_host, char *username, char *password);
 

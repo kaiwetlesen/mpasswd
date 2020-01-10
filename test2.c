@@ -21,20 +21,20 @@ int main(void) {
 	socketfd = connect_by_name("ldap-secondary01.almaden.ibm.com", "ssh");
 	if (!socketfd) {
 		perror("SSH connection failed");
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}
 	session = ssh_connect(socketfd, cfg, &error, &errorline);
 	if (!session) {
 		printf("Could not connect: (%d) %s.\n", error, errorline);
 		disconnect(socketfd);
-		exit(error);
+		exit(EXIT_FAILURE);
 	}
 	channel = ssh_open(session);
 	if (!channel) {
 		printf("Could not establish session: (%d) %s\n", error, errorline);
 		ssh_disconnect(session);
 		disconnect(socketfd);
-		exit(errno);
+		exit(EXIT_FAILURE);
 	}
 	/* Do SSH things here */
 		libssh2_channel_subsystem(channel, "list");
@@ -53,5 +53,5 @@ int main(void) {
 	#endif
 	ssh_disconnect(session);
 	disconnect(socketfd);
-	return 0;
+	return EXIT_SUCCESS;
 }

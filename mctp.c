@@ -11,20 +11,29 @@
  *            new credential
  * passsword: New password to set
  *************************************/
-int MCTP_send_passwd(char *from_host, char *username, char *password) {
+int MCTP_send_cred(char *from_host, char *username, char *password) {
 	char buffer[MCTP_BUFLEN];
-	char *status_code, *message;
-	int status;
+	char *status_text, *message, *reject;
+	long state;
+	int result;
 
 	/* Read first line from MCTP target, should be a status line. */
-	memset(buffer, '\0', MCTP_BUFLEN);
-	MCTP_read(buffer);
+	while (memset(buffer, '\0', MCTP_BUFLEN) && MCTP_read(buffer)) {
 
-	/* Segment the message into status code and message on receipt. */
-	buffer[3] = '\0';
-	status_code = buffer;
-	message = message;
-	status = str
+		/* Segment the message into status code and message on receipt. */
+		buffer[3] = '\0';
+		status_code = buffer;
+		message = buffer + 4;
+
+		state = strtol(status_code, *reject, 10);
+		if (reject) { /* The managed endpoint sent us garbage, bail */
+			result = MCTP_PROTOCOL_ERR;
+			break;
+		}
+
+
+	}
+	return result;
 }
 
 int MCTP_recv_cred(void) {

@@ -59,7 +59,7 @@ int connect_by_name(char *hostname, char *proto) {
 	/* If the connection failed here, bail. */
 	/*if (socket < 0) {
 		printf("Connection failed\n");
-		exit(-1);
+		exit(EXIT_FAILURE);
 	}*/
 
 
@@ -68,7 +68,7 @@ int connect_by_name(char *hostname, char *proto) {
 	errnum = libssh2_init(0);
 	if (errnum != 0) {
 		//printf("SSH initialization failed -- Cannot continue.\n");
-		//exit(-1);
+		//exit(EXIT_FAILURE);
 		return errnum;
 	}
 	*/
