@@ -35,10 +35,10 @@ sent by the target system back to the controlling host. Variant commands are
 separated from their arguments by a _single space character_ (0x20 in UTF-8).
 
 ### Control Command Limits
-All MCTP commands are limited to exactly four octets in length.
+All MCTP command words are exactly four octets in length.
 
 Immediate commands are limited to five characters total including the newline
-terminator, but it is expected tha
+terminator.
 
 Variant commands are permitted to possess one argument such that the argument
 is separated from the command by one space and that the entire command-argument
