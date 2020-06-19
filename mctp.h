@@ -18,12 +18,18 @@
  * libraries.
  */
 
-#ifdef USE_MCTP_SSH
+#if defined USE_MCTP_SSH
 /* Configures as SSH subsystem. */
 #include "mctp-ssh.h"
-#elif USE_MCTP_TLS
+#elif defined USE_MCTP_TLS
 /* Library currently doesn't exist, please do not use. */
 #include "mctp-tls.h"
+#endif
+
+#ifdef MCTP_MSGS_H
+#include MCTP_MSGS_H
+#else
+#include "mctp-messages-en_US.h"
 #endif
 
 /*
@@ -31,7 +37,7 @@
  * is 128 characters, including command, any 
  * arguments, newline, and null terminator.
  */
-#define MCTP_BUFLEN 128
+#define MCTP_BUFLEN 128 /* Either raw data or "CMDW ARGUMENTHERE...", includes null terminator */
 /*
  * NOT USED:
 #define MCTP_PROTCOL_ERR -1
@@ -43,7 +49,10 @@
 #define MCTP_STATE_TRANSITIONS {  }
 */
 #define MCTP_CMDLEN 5 /* Four characters plus null terminator */
-#define MCTP_MSGLEN MCTP_BUFLEN - MCTP_CMDLEN + 2 /* +2 to account for addition */
+#define MCTP_ARGLEN MCTP_BUFLEN - MCTP_CMDLEN - 1 /* Minus one includes newline terminator */
+
+#define MCTP_CODELEN 4 /* Three numerals plus null terminator */
+#define MCTP_MESGLEN MCTP_BUFLEN - MCTP_CODELEN - 1 /* Minus one includes newline terminator */
 
 #define CMD(cmdtext) ((cmdtext)[0] | (cmdtext)[1] << 8 | (cmdtext)[2] << 16 | (cmdtext)[3] << 24)
 
@@ -78,6 +87,7 @@
 #define MCTP_CODE_CONTROLREJECT 521
 #define MCTP_CODE_ACCESSDENIED  530
 #define MCTP_CODE_USERUNKNOWN   551
+#define MCTP_CODE_SIZEEXCEEDED  552
 #define MCTP_CODE_TRANSACTFAIL  554
 
 #define MCTP_STAT_ACK_HELO MCTP_CODE_COMMANDOKAY
@@ -97,7 +107,11 @@
 #define MCTP_STAT_REQ_VRFY MCTP_CODE_WRONGSEQUENCE
 #define MCTP_STAT_REQ_CHPW MCTP_CODE_WRONGSEQUENCE
 
-#define MCTP_MSG_TRANSACTFAIL "Transaction failed"
+#define MCTP_STAT_BGN_DATA MCTP_CODE_BEGINDATA
+#define MCTP_STAT_CTU_DATA MCTP_CODE_CONTINUEDATA
+#define MCTP_STAT_EXC_DATA MCTP_CODE_SIZEEXCEEDED
+
+#define MCTP_STAT_TRANSACTFAIL MCTP_CODE_TRANSACTFAIL MCTP_MSG_TRANSACTFAIL
 
 /* These constants most likely will not be used */
 #define MCTP_CMDFORM_IMMEDIATE 1 /* CMD */

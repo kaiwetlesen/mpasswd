@@ -43,10 +43,16 @@
 /* Messages for indicating that a precondition is not yet met (wrong sequence of commands usually): */
 #define MCTP_MSG_REQ_HELO TOSTR(MCTP_STAT_REQ_HELO) " I do not know who you are, please say HELO first!\n"
 #define MCTP_MSG_REQ_AUTH TOSTR(MCTP_STAT_REQ_AUTH) " Please authenticate yourself prior to requesting this command. Thanks!\n"
-/* This is the one instance where an error pops up because of something
- * other than a wrong sequence, and *should never occur*:
- */
 #define MCTP_MSG_REQ_VRFY TOSTR(MCTP_STAT_REQ_VRFY) " User is not verified. This should not have been checked during CHPW.\n"
 #define MCTP_MSG_REQ_CHPW TOSTR(MCTP_STAT_REQ_CHPW) " You need to request a CHPW prior to providing data.\n"
+
+/* Messages that are used during data transfer: */
+#define MCTP_MSG_BGN_DATA TOSTR(MCTP_STAT_BGN_DATA " Okay, please begin sending data. End transfer with a '.' on its own line.\n"
+#define MCTP_MSG_CTU_DATA TOSTR(MCTP_STAT_CTU_DATA) " Thank you, would you like to send more?\n"
+
+/* Error messages: */
+#define MCTP_MSG_EXC_DATA TOSTR(MCTP_STAT_EXC_DATA) " Unable to accept data transfer, data size exceeds receiving buffer.\n"
+
+#define MCTP_MSG_TRANSACTFAIL "Transaction failed.\n"
 
 #endif

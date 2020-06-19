@@ -60,7 +60,66 @@ int MCTP_recv_cred(void) {
 }
 */
 
-int MCTP_ctlr_recv(char *message, int message_maxlen) {
+int MCTP_ctlr_send_cmnd(char *cmd, char *arg) {
+	char buffer[MCTP_BUFLEN];
+	char *destcmd, *destarg;
+	
+	memset(buffer, '\0', MCTP_BUFLEN);
+	destcmd = buffer;
+	destarg = buffer + MCTP_CMDLEN;
+
+	if (cmd && strlen(cmd) < MCTP_CMDLEN) {
+		strncpy(destcmd, cmd, MCTP_CMDLEN - 1);
+	}
+	else {
+		/* Fast fail if command is too long */
+		return -1;
+	}
+
+	/* Set up the output buffer correctly */
+	if (arg && strlen(arg) < MCTP_ARGLEN) {
+		strncpy(destarg, arg, MCTP_ARGLEN);
+		buffer[MCTP_CMDLEN] = ' ';
+		buffer[MCTP_BUFLEN] = '\n';
+		buffer[MCTP_BUFLEN] = '\0';
+	}
+	else if (!arg) {
+		buffer[MCTP_CMDLEN] = '\n';
+		buffer[MCTP_CMDLEN] = '\0';
+	}
+	else {
+		return -1; /* We can't do this... sorry! */
+	}
+
+	return MCTP_write(buffer);
+}
+
+int MCTP_trgt_recv_cmnd(char *command, char *argument, int argument_maxlen) {
+	char *buffer[MCTP_BUFLEN];
+	char *cmd, *arg;
+	int len;
+
+	/* Read first line from MCTP target, should be a status line. */
+	memset(buffer, '\0', MCTP_BUFLEN);
+	MCTP_read(buffer);
+
+	buffer[MCTP_CMDLEN - 1] = '\0'; /* Divide the received line into command and argument */
+	cmd = buffer;
+	arg = buffer + MCTP_CMDLEN;
+	if (command)  strncpy(command,  cmd, MCTP_CMDLEN);
+	if (argument) strncpy(argument, arg, argument_maxlen);
+	if (message_maxlen > 0) argument[argument_maxlen - 1] = '\0';
+
+	/* Indicate if we got a command that seems to be the right format... */
+	return strnlen(cmd, MCTP_CMDLEN) == MCTP_CMDLEN;
+}
+
+/* Messages are pre-computed in the MCTP header macros */
+int MCTP_trgt_send_stat(char *message) {
+	return MCTP_write(message);
+}
+
+int MCTP_ctlr_recv_stat(char *message, int message_maxlen) {
 	char buffer[MCTP_BUFLEN];
 	char *status_code, *received_message, *extra;
 	int status;
@@ -79,35 +138,77 @@ int MCTP_ctlr_recv(char *message, int message_maxlen) {
 
 	/* Return failure if garbage received */
 	if (extra || status_long > INT_MAX) {
-		status = MCTP_STAT_TRANSACTFAIL;
+		status = MCTP_CODE_TRANSACTFAIL;
 		strncpy(message, MCTP_MSG_TRANSACTFAIL, message_maxlen);
 	}
 	else {
 		status = (int)status_long;
 		strncpy(message, received_message, message_maxlen);
 	}
-	if (message_maxlen > 0) message[message_maxlen - 1] = '\0';
+	/* Ensure the message is null-terminated */
+	message[message_maxlen - 1] = '\0';
 	return status;
 }
 
-int MCTP_trgt_recv(char *command, char *argument, int argument_maxlen) {
+/*
+ * Sends data to an MCTP target, one chunk at a time.
+ * Returns the number of bytes sent.
+ * NOTE: The number of bytes sent may exceed the length
+ * of the input data set.
+ */
+int MCTP_ctlr_send_data(char *data) {
 	char *buffer[MCTP_BUFLEN];
-	char *cmd, *arg;
-	int len;
+	char *mark, *end;
+	int bytes_sent;
+	success = MCTP_read(buffer) < 0;
+	if (!success) {
+		bytes_sent = -1;
+	}
+	else if (strcmp(buffer, MCTP_MSG_BGN_DATA) != 0) {
+		bytes_sent = -1;
+	}
+	else {
+		end = data + strlen(data);
+		for (mark = data; mark < end; mark += MCTP_BUFLEN) {
+			
+		}
+	}
+}
 
-	/* Read first line from MCTP target, should be a status line. */
-	memset(buffer, '\0', MCTP_MSGLEN);
-	MCTP_read(buffer);
+/* 
+ * Receives one chunk of MCTP data during an MCTP 
+ * data transfer.
+ */
+int MCTP_trgt_recv_data(char *data, int data_maxlen) {
+	char *buffer[MCTP_BUFLEN];
+	char *dest;
+	int len, chunklen, chunkmaxlen;
 
-	buffer[MCTP_CMDLEN - 1] = '\0'; /* Divide the received line into command and argument */
-	cmd = buffer;
-	arg = buffer + MCTP_CMDLEN;
-	if (command)  strncpy(command,  cmd, MCTP_CMDLEN);
-	if (argument) strncpy(argument, arg, argument_maxlen);
-	if (message_maxlen > 0) argument[argument_maxlen - 1] = '\0';
+ 	/* Set up to begin copying into the given data space */
+	memset(data, '\0', data_maxlen);
+	dest = data;
+	MCTP_write(MCTP_MSG_BGN_DATA);
 
-	/* Indicate if we got a command that seems to be the right format... */
-	return strnlen(cmd, MCTP_CMDLEN) == MCTP_CMDLEN;
+	while (len < data_maxlen) {
+		/* Clean the buffers */
+		memset(buffer, '\0', MCTP_BUFLEN);
+		MCTP_read(buffer);
+
+		if (strcmp(buffer, ".\n") == 0) { /* Period on its own line */
+			len = data_maxlen;
+		}
+		else {
+			/* Copy in the data chunk. Drop bytes in data chunk if exceeds length. */
+			chunklen = strlen(buffer);
+			chunkmaxlen = data_maxlen - len;
+			chunklen = chunklen < chunkmaxlen ? chunklen : chunkmaxlen;
+			len += chunklen;
+			strncpy(data, buffer, chunklen - 2); // Exclude the newline
+			/* Inform the client we've received and they may send more. */
+			MCTP_write(MCTP_MSG_CTU_DATA);
+		}
+	}
+	return len;
 }
 
 /**
